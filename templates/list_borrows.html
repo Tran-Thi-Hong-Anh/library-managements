@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh Sách Phiếu Mượn</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function confirmDelete(event) {
+            if (!confirm("Bạn có chắc chắn muốn xóa phiếu mượn này không?")) {
+                event.preventDefault();
+            }
+        }
+        function confirmReturn() {
+            return confirm("Bạn có chắc chắn muốn trả sách này không?");
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>DANH SÁCH PHIẾU MƯỢN</h2>
+
+        <form action="{{ url_for('list_borrows') }}" method="GET">
+            <label for="search">Tìm kiếm:</label>
+            <input type="text" id="search" name="query" placeholder="Nhập ID Độc Giả, Mã Sách, Trạng Thái" value="{{ query }}">
+            <input type="submit" value="Tìm kiếm">
+            {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+            <a href="{{ url_for('add_borrow') }}" class="btn">Thêm Phiếu Mượn</a>
+            {% endif %}
+        </form>
+        
+        <!-- Hiển thị thông báo nếu có -->
+        {% if message %}
+            <div class="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Phiếu Mượn</th>
+                    <th>ID Thủ Thư</th>
+                    <th>ID Độc Giả</th>
+                    <th>Mã Sách</th>
+                    <th>Ngày Mượn</th>
+                    <th>Ngày Trả</th>
+                    <th>Trạng Thái</th>
+                    <th>Tiền Phạt </th>
+                    <th>Hành Dộng</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for borrow in borrows %}
+                <tr>
+                    <td>{{ borrow[0] }}</td>
+                    <td>{{ borrow[1] }}</td>
+                    <td>{{ borrow[2] }}</td>
+                    <td>{{ borrow[3] }}</td>
+                    <td>{{ borrow[4] }}</td>
+                    <td>{{ borrow[5] }}</td>
+                    <td>{{ borrow[6] }}</td>
+                    <td>{{ borrow[7] }}</td>
+                    <td>
+                        {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                        <form action="{{ url_for('edit_borrow', id_muon=borrow[0]) }}" method="get" style="display:inline;">
+                            <button class="btn" type="submit">Sửa</button>
+                        </form>
+                        <form action="{{ url_for('delete_borrow', id_muon=borrow[0]) }}" method="post" style="display:inline;">
+                            <button class="btn" onclick="confirmDelete(event)" type="submit">Xoá</button>
+                            <br>
+                        </form>
+                        {% endif %}
+                        
+                        {% if borrow[6] == 'Đang Mượn' %}
+                        <br>
+                        <form action="{{ url_for('return_borrow', id_muon=borrow[0]) }}" method="post" style="display:inline;" onsubmit="return confirmReturn();">
+                            <button class="btn" type="submit">Trả Sách</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Phân trang -->
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url_for('list_borrows', page=page - 1, query=query) }}">« Trang Trước</a>
+            {% endif %}
+            
+            <span>Trang {{ page }} / {{ total_pages }} | Hiện có {{ borrows|length }}/{{ total_borrows }} dòng </span>
+            
+            {% if page < total_pages %}
+                <a href="{{ url_for('list_borrows', page=page + 1, query=query) }}">Trang Sau »</a>
+            {% endif %}
+        </div>
+
+    </main>
+    <footer>
+        <p>&copy; 2024 Quản Lý Thư Viện</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa Thủ Thư</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateForm() {
+            const ten = document.getElementById('ten').value;
+            const email = document.getElementById('email').value;
+            const sdt = document.getElementById('sdt').value;
+            const ngay_sinh = document.getElementById('ngay_sinh').value;
+            const que_quan = document.getElementById('que_quan').value;
+
+            // Kiểm tra trường không được bỏ trống
+            if (!ten || !email || !sdt || !ngay_sinh || !que_quan) {
+                alert("Vui lòng không để trống các trường bắt buộc!");
+                return false;
+            }
+
+            // Kiểm tra số điện thoại không chứa chữ
+            if (isNaN(sdt) || sdt.trim() === "") {
+                alert("Trường 'Số Điện Thoại' phải là số!");
+                return false;
+            }
+
+            return true; // Nếu tất cả đều hợp lệ
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>SỬA THÔNG TIN THỦ THƯ</h2>
+
+        <!-- Hiển thị thông báo nếu có -->
+        {% if request.args.get('message') %}
+            <div class="alert alert-success">
+                {{ request.args.get('message') }}
+            </div>
+        {% endif %}
+        
+        <form action="{{ url_for('edit_librarian', id_thu_thu=librarian[0]) }}" method="post" onsubmit="return validateForm()">
+            <label for="ten">Tên:</label>
+            <input type="text" id="ten" name="ten" value="{{ librarian[1] }}" required><br>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ librarian[2] }}" required><br>
+            
+            <label for="sdt">Số Điện Thoại:</label>
+            <input type="text" id="sdt" name="sdt" value="{{ librarian[3] }}" required><br>
+            
+            <label for="ngay_sinh">Ngày Sinh:</label>
+            <input type="date" id="ngay_sinh" name="ngay_sinh" value="{{ librarian[4] }}" required><br>
+            <br>
+            <label for="que_quan">Quê Quán:</label>
+            <input type="text" id="que_quan" name="que_quan" value="{{ librarian[5] }}" required><br>
+            
+            <button class="btn" type="submit">Cập Nhật Thủ Thư</button>
+            <a href="{{ url_for('librarians') }}" class="btn">Quay lại danh sách thủ thư</a>
+        </form>
+        
+    </main>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh Sách Thủ Thư</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>DANH SÁCH THỦ THƯ</h2>
+
+        <form action="{{ url_for('librarians') }}" method="GET">
+            <label for="search">Tìm kiếm thủ thư:</label>
+            <input type="text" id="search" name="query" value="{{ query }}" placeholder="Nhập tên, email, hoặc số điện thoại...">
+            <input type="submit" value="Tìm kiếm">
+            <a href="{{ url_for('add_librarian') }}" class="btn">Thêm Thủ Thư</a>
+        </form>
+        <!-- Hiển thị thông báo nếu có -->
+        {% if message %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Số Điện Thoại</th>
+                    <th>Ngày Sinh</th>
+                    <th>Quê Quán</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for librarian in librarians %}
+                <tr>
+                    <td>{{ librarian[0] }}</td>
+                    <td>{{ librarian[1] }}</td>
+                    <td>{{ librarian[2] }}</td>
+                    <td>{{ librarian[3] }}</td>
+                    <td>{{ librarian[4] }}</td>
+                    <td>{{ librarian[5] }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_librarian', id_thu_thu=librarian[0]) }}" class="btn">Sửa</a>
+                        <a href="{{ url_for('delete_librarian', id_thu_thu=librarian[0]) }}" class="btn" onclick="confirmDelete(event)">Xóa</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Phân trang -->
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url_for('librarians', page=page - 1, query=query) }}">« Trang Trước</a>
+            {% endif %}
+            
+            <span>Trang {{ page }} / {{ total_pages }} | Hiện có {{ librarians|length }}/{{ total_librarians }} dòng </span>
+            
+            {% if page < total_pages %}
+                <a href="{{ url_for('librarians', page=page + 1, query=query) }}">Trang Sau »</a>
+            {% endif %}
+        </div>
+
+        
+    </main>
+    <footer>
+        <p>&copy; 2024 Quản Lý Thư Viện</p>
+    </footer>
+</body>
+</html>

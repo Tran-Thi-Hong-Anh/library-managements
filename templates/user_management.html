@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Người Dùng</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function confirmDelete(event) {
+            if (!confirm("Bạn có chắc chắn muốn xóa sách này không?")) {
+                event.preventDefault();
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>DANH SÁCH NGƯỜI DÙNG</h2>
+
+        <form action="{{ url_for('user_management') }}" method="GET">
+            <label for="search">Tìm kiếm người dùng:</label>
+            <input type="text" id="search" name="query" value="{{ query }}" placeholder="Nhập tên hoặc email...">
+            <input type="submit" value="Tìm kiếm">
+            <a href="{{ url_for('add_user') }}" class="btn">Thêm Người Dùng</a>
+        </form>
+        
+        <!-- Hiển thị thông báo nếu có -->
+        {% if message %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Loại</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[2] }}</td>
+                    <td>{{ user[4] }}</td>
+                    <td>
+                        <br>
+                        <a href="{{ url_for('edit_user', user_id=user[0]) }}" class="btn">Sửa</a>
+                        <a href="{{ url_for('delete_user', user_id=user[0]) }}" class="btn" onclick="confirmDelete(event)">Xóa</a>
+                        <br>
+                        <br>
+                        <br>
+                        <br></br>
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Phân trang -->
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url_for('user_management', page=page - 1, query=query) }}">« Trang Trước</a>
+            {% endif %}
+            
+            <span>Trang {{ page }} / {{ total_pages }} | Hiện có {{ users|length }}/{{ total_users }} dòng </span>
+            
+            {% if page < total_pages %}
+                <a href="{{ url_for('user_management', page=page + 1, query=query) }}">Trang Sau »</a>
+            {% endif %}
+        </div>
+
+    </main>
+    <footer>
+        <p>&copy; 2024 Quản Lý Thư Viện</p>
+    </footer>
+</body>
+</html>

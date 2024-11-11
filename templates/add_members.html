@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Độc Giả</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateForm() {
+            const ten_docgia = document.getElementById('ten_docgia').value;
+            const so_CMND = document.getElementById('so_CMND').value;
+            const so_DT = document.getElementById('so_DT').value;
+            const dia_Chi = document.getElementById('dia_Chi').value;
+
+            // Kiểm tra trường không được bỏ trống
+            if (!ten_docgia || !so_CMND || !so_DT || !dia_Chi) {
+                alert("Vui lòng không để trống các trường bắt buộc!");
+                return false;
+            }
+
+            // Kiểm tra số CMND và số điện thoại có phải là số không
+            if (isNaN(so_CMND) || isNaN(so_DT)) {
+                alert("Chứng Minh Nhân Dân và Số Điện Thoại chỉ được nhập số!");
+                return false;
+            }
+
+            // Kiểm tra độ dài số CMND và số điện thoại
+            if (so_CMND.length !== 12) {
+                alert("Số CMND phải có 12 số.");
+                return false;
+            }
+
+            if (so_DT.length !== 10) {
+                alert("Số điện thoại phải có 10 số.");
+                return false;
+            }
+
+            return true; // Nếu tất cả đều hợp lệ
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>THÊM ĐỘC GIẢ MỚI</h2>
+
+        <!-- Hiển thị thông báo nếu có -->
+        {% if message %}
+            <div class="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <form action="{{ url_for('add_member') }}" method="post" onsubmit="return validateForm()">
+            <label for="ten_docgia">Họ Và Tên:</label>
+            <input type="text" id="ten_docgia" name="ten_docgia" required><br>
+            <label for="ngay_sinh">Ngày Sinh:</label>
+            <input type="date" id="ngay_sinh" name="ngay_sinh"><br>
+            <br>
+            <label for="so_CMND">Chứng Minh Nhân Dân:</label>
+            <input type="text" id="so_CMND" name="so_CMND" required><br>
+            <label for="so_DT">Số Điện Thoại:</label>
+            <input type="text" id="so_DT" name="so_DT" required><br>
+            <label for="ngay_HHT">Ngày Hết Hạn Thẻ:</label>
+            <input type="date" id="ngay_HHT" name="ngay_HHT"><br>
+            <br>
+            <label for="dia_Chi">Địa Chỉ:</label>
+            <input type="text" id="dia_Chi" name="dia_Chi" required><br>
+            <button class="btn" type="submit">Thêm Độc Giả</button>
+            <a href="{{ url_for('members') }}" class="btn">Quay lại danh sách độc giả</a>
+        </form>
+        
+    </main>
+</body>
+</html>

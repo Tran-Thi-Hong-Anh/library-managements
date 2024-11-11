@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa Phiếu Mượn-Trả</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateForm() {
+            const id_thu_thu = document.getElementById('id_thu_thu').value;
+            const id_docgia = document.getElementById('id_docgia').value;
+            const ma_sach = document.getElementById('ma_sach').value;
+            const ngay_muon = document.getElementById('ngay_muon').value;
+            const ngay_tra = document.getElementById('ngay_tra').value;
+
+            // Kiểm tra trường không được bỏ trống
+            if (!id_thu_thu || !id_docgia || !ma_sach || !ngay_muon || !ngay_tra) {
+                alert("Vui lòng không để trống các trường bắt buộc!");
+                return false;
+            }
+
+            // Kiểm tra các trường số không chứa chữ
+            if (isNaN(id_thu_thu) || isNaN(id_docgia) || isNaN(ma_sach)) {
+                alert("Các trường 'ID Thủ Thư', 'ID Độc Giả' và 'Mã Sách' phải là số!");
+                return false;
+            }
+
+            return true; // Nếu tất cả đều hợp lệ
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>SỬA THÔNG TIN PHIẾU MƯỢN</h2>
+
+        <!-- Hiển thị thông báo nếu có -->
+        {% if request.args.get('message') %}
+            <div class="alert alert-success">
+                {{ request.args.get('message') }}
+            </div>
+        {% endif %}
+        
+        <form action="{{ url_for('edit_borrow', id_muon=borrow[0]) }}" method="post" onsubmit="return validateForm()">
+            <label for="id_thu_thu">ID Thủ Thư:</label>
+            <input type="number" id="id_thu_thu" name="id_thu_thu" value="{{ borrow[3] }}" required><br>
+
+            <label for="id_docgia">ID Độc Giả:</label>
+            <input type="number" id="id_docgia" name="id_docgia" value="{{ borrow[1] }}" required><br>
+
+            <label for="ma_sach">Mã Sách:</label>
+            <input type="number" id="ma_sach" name="ma_sach" value="{{ borrow[2] }}" required><br>
+
+            <label for="ngay_muon">Ngày Mượn:</label>
+            <input type="date" id="ngay_muon" name="ngay_muon" value="{{ borrow[4] }}" required><br>
+            <br>
+            <label for="ngay_tra">Ngày Trả:</label>
+            <input type="date" id="ngay_tra" name="ngay_tra" value="{{ borrow[5] }}" required><br>
+            <br>
+            <button class="btn" type="submit">Lưu</button>
+        </form>
+    </main>
+</body>
+</html>

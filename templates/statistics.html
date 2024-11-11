@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống Kê Thư Viện</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        
+       
+    </style>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>CHỌN THỐNG KÊ</h2>
+        <form action="{{ url_for('generate_statistics') }}" method="GET">
+            <div class="statistic-options">
+                <div class="statistic-row">
+                    <div class="statistic-option">
+                        <input type="radio" id="total_books" name="statistic_type" value="total_books" required>
+                        <label for="total_books">TỔNG SỐ SÁCH</label>
+                    </div>
+                    <div class="statistic-option">
+                        <input type="radio" id="total_members" name="statistic_type" value="total_members">
+                        <label for="total_members">TỔNG SỐ ĐỘC GIẢ</label>
+                    </div>
+                    <div class="statistic-option">
+                        <input type="radio" id="total_borrows" name="statistic_type" value="total_borrows">
+                        <label for="total_borrows">TỔNG SỐ PHIẾU MƯỢN</label>
+                    </div>
+                </div>
+                <div class="statistic-row">
+                    <div class="statistic-option">
+                        <input type="radio" id="books_by_genre" name="statistic_type" value="books_by_genre">
+                        <label for="books_by_genre">SỐ LƯỢNG SÁCH THEO THỂ LOẠI</label>
+                    </div>
+                    <div class="statistic-option">
+                        <input type="radio" id="books_by_author" name="statistic_type" value="books_by_author">
+                        <label for="books_by_author">SỐ LƯỢNG SÁCH THEO TÁC GIẢ</label>
+                    </div>
+                    <div class="statistic-option">
+                        <input type="radio" id="overdue_books" name="statistic_type" value="overdue_books">
+                        <label for="overdue_books">SỐ LƯỢNG SÁCH QUÁ HẠN</label>
+                    </div>
+                </div>
+            </div>
+            <input type="submit" value="Thống Kê">
+        </form>
+
+        <!-- Hiển thị kết quả thống kê nếu có -->
+        {% if statistics %}
+            <h3>Kết quả thống kê:</h3>
+            <div class="statistics">
+                {{ statistics }}
+            </div>
+        {% endif %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Quản Lý Thư Viện</p>
+    </footer>
+</body>
+</html>

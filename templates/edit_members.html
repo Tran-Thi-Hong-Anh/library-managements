@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa Thông Tin Độc Giả</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateForm() {
+            const ten_docgia = document.getElementById('ten_docgia').value;
+            const ngay_sinh = document.getElementById('ngay_sinh').value;
+            const so_CMND = document.getElementById('so_CMND').value;
+            const so_DT = document.getElementById('so_DT').value;
+            const ngay_HHT = document.getElementById('ngay_HHT').value;
+            const dia_Chi = document.getElementById('dia_Chi').value;
+
+            // Kiểm tra trường không được bỏ trống
+            if (!ten_docgia || !ngay_sinh || !so_CMND || !so_DT || !ngay_HHT || !dia_Chi) {
+                alert("Vui lòng không để trống các trường bắt buộc!");
+                return false;
+            }
+
+            // Kiểm tra số CMND và số điện thoại không chứa chữ
+            if (isNaN(so_CMND) || so_CMND.trim() === "") {
+                alert("Trường 'Số CMND' phải là số!");
+                return false;
+            }
+            if (isNaN(so_DT) || so_DT.trim() === "") {
+                alert("Trường 'Số Điện Thoại' phải là số!");
+                return false;
+            }
+
+            return true; // Nếu tất cả đều hợp lệ
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>SỬA THÔNG TIN ĐỘC GIẢ</h2>
+
+        <!-- Hiển thị thông báo nếu có -->
+        {% if request.args.get('message') %}
+          <div class="alert alert-success">
+              {{ request.args.get('message') }}
+          </div>
+        {% endif %}
+
+        <form action="{{ url_for('update_member', id_docgia=member[0]) }}" method="post" onsubmit="return validateForm()">
+            <label for="ten_docgia">Tên Độc Giả:</label>
+            <input type="text" id="ten_docgia" name="ten_docgia" value="{{ member[1] }}" required><br>
+            <label for="ngay_sinh">Ngày Sinh:</label>
+            <input type="date" id="ngay_sinh" name="ngay_sinh" value="{{ member[2] }}" required><br>
+            <br>
+            <label for="so_CMND">Số CMND:</label>
+            <input type="text" id="so_CMND" name="so_CMND" value="{{ member[3] }}" required><br>
+            <label for="so_DT">Số Điện Thoại:</label>
+            <input type="text" id="so_DT" name="so_DT" value="{{ member[4] }}" required><br>
+            <label for="ngay_HHT">Ngày Hết Hạn Thẻ:</label>
+            <input type="date" id="ngay_HHT" name="ngay_HHT" value="{{ member[5] }}" required><br>
+            <br>
+            <label for="dia_Chi">Địa Chỉ:</label>
+            <input type="text" id="dia_Chi" name="dia_Chi" value="{{ member[6] }}" required><br>
+            <button class="btn" type="submit">Lưu</button>
+            <a href="{{ url_for('members') }}" class="btn">Quay lại danh sách độc giả</a>
+        </form>
+
+        
+    </main>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>DANH SÁCH SÁCH</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function confirmDelete(event) {
+            if (!confirm("Bạn có chắc chắn muốn xóa sách này không?")) {
+                event.preventDefault();
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>DANH SÁCH SÁCH</h2>
+
+        <form name="searchMemberForm" action="{{ url_for('books') }}" method="GET">
+            <label for="search">Tìm kiếm sách:</label>
+            <input type="text" id="search" name="query" placeholder="Nhập tên sách, tác giả, năm xuất bản, ...">
+            <input type="submit" value="Tìm kiếm">
+            {% if session.get('user_role') == 'Thủ thư' %}
+            <a href="{{ url_for('add_book') }}" class="btn">Thêm Sách</a>
+            {% endif %}
+        </form>
+        
+        <!-- Hiển thị thông báo nếu có -->
+        {% if message %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã Sách</th>
+                    <th>Tên Sách</th>
+                    <th>Tên Tác Giả</th>
+                    <th>Nhà Xuất Bản</th>
+                    <th>Năm Xuất Bản</th>
+                    <th>Loại Sách</th>
+                    <th>Số Lượng</th>
+                    <th>Số Trang</th>
+                    <th>Số Tiền</th> <!-- Thêm cột Số Tiền -->
+                    <th>Vị Trí</th> <!-- Thêm cột Vị Trí -->
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book[0] }}</td>
+                    <td>{{ book[1] }}</td>
+                    <td>{{ book[2] }}</td>
+                    <td>{{ book[3] }}</td>
+                    <td>{{ book[4] }}</td>
+                    <td>{{ book[5] }}</td>
+                    <td>{{ book[6] }}</td>
+                    <td>{{ book[7] }}</td>
+                    <td>{{ book[8] }}</td>
+                    <td>{{ book[9] }}</td>
+                    <td>
+                            {% if session.get('user_role') == 'Thủ thư' %}
+                            <br>
+                            <a href="{{ url_for('edit_book', book_id=book[0]) }}" class="btn">Sửa</a> 
+                            <a href="{{ url_for('delete_book', book_id=book[0]) }}" class="btn" onclick="confirmDelete(event)">Xóa</a><br>
+                            {% endif %}
+                            <br> <br>
+                            {% if session.get('user_role')  in ['Độc giả', 'Thủ thư']  %}
+                            <a href="{{ url_for('add_borrow', book_id=book[0]) }}" class="btn">Mượn</a>
+                            <br>
+                            {% endif %}
+                            
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+         <!-- Phân trang -->
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url_for('books', page=page - 1, query=query) }}">« Trang Trước</a>
+            {% endif %}
+            
+            <span>Trang {{ page }} / {{ total_pages }} | Hiện có {{ books|length }}/{{ total_books }} dòng </span>
+            
+            {% if page < total_pages %}
+                <a href="{{ url_for('books', page=page + 1, query=query) }}">Trang Sau »</a>
+            {% endif %}
+        </div>
+
+        
+    </main>
+    <footer>
+        <p>&copy; 2024 Quản Lý Thư Viện</p>
+    </footer>
+</body>
+</html>

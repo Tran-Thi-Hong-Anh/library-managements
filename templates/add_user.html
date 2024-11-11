@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Người Dùng</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateForm() {
+            const ten = document.getElementById('ten').value;
+            const email = document.getElementById('email').value;
+            const mat_khau = document.getElementById('mat_khau').value;
+            const loai = document.getElementById('loai').value;
+
+            // Kiểm tra trường không được bỏ trống
+            if (!ten || !email || !mat_khau || !loai) {
+                alert("Vui lòng không để trống các trường bắt buộc!");
+                return false;
+            }
+
+            return true; // Nếu tất cả đều hợp lệ
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>THÊM NGƯỜI DÙNG MỚI</h2>
+        
+        <!-- Hiển thị thông báo nếu có -->
+        {% if message %}
+            <div class="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <form method="post" onsubmit="return validateForm()">
+            <label for="ten">Tên:</label>
+            <input type="text" id="ten" name="ten" required>
+            <br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <br>
+            <label for="mat_khau">Mật khẩu:</label>
+            <input type="password" id="mat_khau" name="mat_khau" required>
+            <br>
+            <label for="loai">Quyền:</label>
+            <select id="loai" name="loai" required>
+                <option value="1">Quản trị viên</option>
+                <option value="2">Thủ thư</option>
+                <option value="3">Độc giả</option>
+            </select>
+            <br>
+            <br>
+            <button class="btn" type="submit">Thêm</button>
+            <a href="{{ url_for('user_management') }}" class="btn">Quay lại danh sách người dùng</a>
+        </form>
+        
+    </main>
+    
+</body>
+</html>

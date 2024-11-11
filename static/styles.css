@@ -1,0 +1,222 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #d9b89c; /* Màu nền giống màu gỗ */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #8b5a2b; /* Màu gỗ tối hơn cho header */
+    color: white;
+    padding: 15px 30px; /* Tăng padding cho header */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex; /* Sử dụng flex để sắp xếp các liên kết */
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px; /* Cải thiện khoảng cách cho link */
+    border-radius: 5px; /* Bo góc cho link */
+    transition: background 0.3s, color 0.3s;
+}
+
+nav ul li a:hover {
+    background: rgba(255, 255, 255, 0.2); /* Màu nền khi hover */
+}
+
+main {
+    margin: 20px;
+    background: #f0e0d6; /* Màu nền cho main giống màu gỗ nhạt */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    overflow-x: auto; /* Thêm scroll cho main nếu nội dung quá rộng */
+}
+
+h2 {
+    margin-top: 0;
+    color: #333; /* Thay đổi màu cho tiêu đề */
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px; /* Khoảng cách giữa label và input */
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type="submit"],
+.btn {
+    background-color: #6f4c3e; /* Màu nâu cho button */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover,
+.btn:hover {
+    background-color: #5b3e32; /* Màu nâu tối hơn khi hover */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse; /* Sát nhập các đường kẻ */
+    margin: 20px 0; /* Thêm margin cho các bảng */
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    min-width: 100px;
+    min-height: 60px; /* Chiều cao tối thiểu cho mỗi ô */
+    border: 1px solid #ccc; /* Thêm border cho th và td */
+}
+table td {
+    padding: 10px;
+    text-align: left;
+}
+
+table th, table td {
+    min-width: 150px; /* Chiều rộng tối thiểu cho mỗi ô */
+}
+table td:last-child {
+    width: 150px; /* Thay đổi chiều rộng cho cột Hành Động */
+}
+th {
+    background-color: #f2f2f2;
+    font-weight: bold; /* Đậm cho tiêu đề bảng */
+}
+
+footer {
+    text-align: center;
+    padding: 10px 0;
+    background: #8b5a2b; /* Màu gỗ tối hơn cho footer */
+    color: white;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.alert {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.statistic-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.statistic-row {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.statistic-option {
+    display: inline-block;
+    width: 300px;
+    height: 180px;
+    margin: 10px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 180px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.statistic-option:hover {
+    background: #e7f3ff;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + label {
+    background: #cce5ff;
+}
+
+.statistics {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+.library-image {
+    position: relative; /* Để có thể định vị overlay */
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    overflow: hidden; /* Ẩn phần vượt ra ngoài */
+}
+
+.library-image img {
+    width: 100%; /* Chiều rộng hình ảnh bằng 100% */
+    height: auto; /* Giữ tỉ lệ chiều cao */
+    max-height: 750px; /* Giới hạn chiều cao tối đa */
+    display: block; /* Ngăn ngừa khoảng trắng dưới hình ảnh */
+}
+
+.overlay {
+    position: absolute; /* Để định vị lên trên hình ảnh */
+    top: 50%; /* Giữa theo chiều dọc */
+    left: 50%; /* Giữa theo chiều ngang */
+    transform: translate(-50%, -50%); /* Đưa vị trí về giữa */
+    color: white; /* Màu chữ */
+    text-align: center; /* Căn giữa chữ */
+    background-color: rgba(223, 212, 212, 0.5); /* Nền bán trong suốt */
+    padding: 30px; /* Khoảng cách bên trong */
+    border-radius: 10px; /* Bo góc cho nền */
+    width: 40%; /* Để tránh quá rộng */
+}

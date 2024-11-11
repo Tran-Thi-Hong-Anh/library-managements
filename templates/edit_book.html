@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa Sách</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateForm() {
+            const ten_sach = document.getElementById('ten_sach').value;
+            const ten_TG = document.getElementById('ten_TG').value;
+            const nha_XB = document.getElementById('nha_XB').value;
+            const nam_XB = document.getElementById('nam_XB').value;
+            const loai_sach = document.getElementById('loai_sach').value;
+            const so_luong = document.getElementById('so_luong').value;
+            const so_trang = document.getElementById('so_trang').value;
+            const so_tien = document.getElementById('so_tien').value; // Thêm trường Số Tiền
+            const vi_tri = document.getElementById('vi_tri').value; // Thêm trường Vị Trí
+
+            // Kiểm tra trường không được bỏ trống
+            if (!ten_sach || !ten_TG || !nha_XB || !nam_XB || !loai_sach || !so_luong || !so_trang || !so_tien || !vi_tri) {
+                alert("Vui lòng không để trống các trường bắt buộc!");
+                return false;
+            }
+
+            // Kiểm tra các trường số không chứa chữ
+            if (isNaN(nam_XB) || isNaN(so_luong) || isNaN(so_trang) || isNaN(so_tien)) {
+                alert("Các trường 'Năm Xuất Bản', 'Số Lượng', 'Số Trang' và 'Số Tiền' phải là số!");
+                return false;
+            }
+
+            return true; // Nếu tất cả đều hợp lệ
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>LIB ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">TRANG CHỦ</a></li>
+                {% if session.get('user_role') == 'Thủ thư' or session.get('user_role') == 'Độc giả' %}
+                    <li><a href="/books">SÁCH</a></li>
+                    <li><a href="/list_borrows">MƯỢN - TRẢ</a></li>
+                {% endif %}
+
+                {% if session.get('user_role') == 'Thủ thư' %}
+                    <li><a href="/members">ĐỘC GIẢ</a></li>
+                {% endif %}
+            
+                {% if session.get('user_role') == 'Quản trị viên' %}
+                    <li><a href="/librarians">QUẢN LÝ THỦ THƯ</a></li>
+                    <li><a href="/user_management">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                {% endif %}
+            
+                <!-- Thống Kê cho cả Thủ thư và Quản trị viên -->
+                {% if session.get('user_role') in ['Quản trị viên', 'Thủ thư'] %}
+                    <li><a href="/generate_statistics">THỐNG KÊ</a></li>
+                {% endif %}
+            
+                <li><a href="/logout">ĐĂNG XUẤT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>SỬA THÔNG TIN SÁCH</h2>
+
+        <!-- Hiển thị thông báo nếu có -->
+        {% if request.args.get('message') %}
+            <div class="alert alert-success">
+                {{ request.args.get('message') }}
+            </div>
+        {% endif %}
+        
+        <form action="{{ url_for('update_book', book_id=book[0]) }}" method="post" onsubmit="return validateForm()">
+            <label for="ten_sach">Tên Sách:</label>
+            <input type="text" id="ten_sach" name="ten_sach" value="{{ book[1] }}" required><br>
+            
+            <label for="ten_TG">Tên Tác Giả:</label>
+            <input type="text" id="ten_TG" name="ten_TG" value="{{ book[2] }}" required><br>
+            
+            <label for="nha_XB">Nhà Xuất Bản:</label>
+            <input type="text" id="nha_XB" name="nha_XB" value="{{ book[3] }}" required><br>
+            
+            <label for="nam_XB">Năm Xuất Bản:</label>
+            <input type="number" id="nam_XB" name="nam_XB" value="{{ book[4] }}" required><br>
+            
+            <label for="loai_sach">Loại Sách:</label>
+            <input type="text" id="loai_sach" name="loai_sach" value="{{ book[5] }}" required><br>
+            
+            <label for="so_luong">Số Lượng:</label>
+            <input type="number" id="so_luong" name="so_luong" value="{{ book[6] }}" required><br>
+            
+            <label for="so_trang">Số Trang:</label>
+            <input type="number" id="so_trang" name="so_trang" value="{{ book[7] }}" required><br>
+
+            <label for="so_tien">Số Tiền:</label> <!-- Thêm trường Số Tiền -->
+            <input type="number" id="so_tien" name="so_tien" value="{{ book[8] }}" required><br>
+
+            <label for="vi_tri">Vị Trí:</label> <!-- Thêm trường Vị Trí -->
+            <input type="text" id="vi_tri" name="vi_tri" value="{{ book[9] }}" required><br>
+            
+            <button class="btn" type="submit">Lưu</button>
+            <a href="{{ url_for('books') }}" class="btn">Quay lại sách</a>
+        </form>
+        
+    </main>
+</body>
+</html>
